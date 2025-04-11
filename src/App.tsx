@@ -4,6 +4,7 @@ import { supabase } from "./lib/supabaseClient"
 import Auth from "./pages/Auth"
 import AppLayout from "./components/AppLayout"
 import PopularCoins from "./components/PopularCoins"
+import SearchBar from "./components/SearchBar"
 
 function App() {
   const [user, setUser] = useState<any>(null)
@@ -27,6 +28,7 @@ function App() {
 
   return (
     <AppLayout isAuthenticated={!!user}>
+      <SearchBar />
       <PopularCoins />
     </AppLayout>
   )
