@@ -1,12 +1,17 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* ❌ REMOVA essa limitação de largura e centralização */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  background-color: theme('colors.base-200');
 }
+
+/* Os estilos de logo, card e animation podem ser mantidos se ainda estiver usando */
 
 .logo {
   height: 6em;
