@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { supabase } from "../lib/supabaseClient.ts"
+import { supabase } from "../lib/supabaseClient"
 
 export default function Auth() {
   const [email, setEmail] = useState("")
@@ -20,7 +20,7 @@ export default function Auth() {
     if (error) {
       setError(error.message)
     } else {
-      alert(isLogin ? "Login feito!" : "Cadastro realizado!")
+      alert(isLogin ? "Logged in successfully!" : "Account created successfully!")
     }
 
     setLoading(false)
@@ -31,7 +31,7 @@ export default function Auth() {
       <div className="card w-96 bg-base-100 shadow-xl">
         <div className="card-body">
           <h2 className="card-title justify-center">
-            {isLogin ? "Login" : "Cadastro"}
+            {isLogin ? "Login" : "Sign Up"}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -46,7 +46,7 @@ export default function Auth() {
 
             <input
               type="password"
-              placeholder="Senha"
+              placeholder="Password"
               className="input input-bordered w-full"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -59,19 +59,19 @@ export default function Auth() {
               type="submit"
               className={`btn w-full ${loading ? "btn-disabled" : "btn-primary"}`}
             >
-              {loading ? "Carregando..." : isLogin ? "Entrar" : "Cadastrar"}
+              {loading ? "Loading..." : isLogin ? "Log In" : "Create Account"}
             </button>
           </form>
 
-          <div className="divider">ou</div>
+          <div className="divider">or</div>
 
           <button
             className="btn btn-ghost text-sm"
             onClick={() => setIsLogin(!isLogin)}
           >
             {isLogin
-              ? "Não tem conta? Cadastre-se"
-              : "Já tem conta? Fazer login"}
+              ? "Don't have an account? Sign up"
+              : "Already have an account? Log in"}
           </button>
         </div>
       </div>
