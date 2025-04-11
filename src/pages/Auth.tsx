@@ -13,14 +13,29 @@ export default function Auth() {
     setLoading(true)
     setError("")
 
-    const { error } = isLogin
-      ? await supabase.auth.signInWithPassword({ email, password })
-      : await supabase.auth.signUp({ email, password })
-
-    if (error) {
-      setError(error.message)
+    if (isLogin) {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) {
+        setError(error.message)
+      } else {
+        alert("Logged in successfully!")
+      }
     } else {
-      alert(isLogin ? "Logged in successfully!" : "Account created successfully!")
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      })
+
+      if (signUpError) {
+        setError(signUpError.message)
+        setLoading(false)
+        return
+      }
+
+      // A trigger no banco já insere automaticamente na tabela 'users'
+      // Nenhum insert manual necessário
+
+      alert("Account created successfully! Please confirm your email.")
     }
 
     setLoading(false)
