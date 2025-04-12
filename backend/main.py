@@ -2,7 +2,9 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from services.coingecko import search_coins
 from services.popular import get_popular_coins
+from services.search import get_cached_coins
 from services.search import search_local_coins
+
 
 app = FastAPI()
 
@@ -14,6 +16,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.on_event("startup")
+async def load_coin_cache_on_start():
+    print("⚙️  Warming up search cache...")
+    await get_cached_coins()
+    print("✅ Search cache ready!")
 
 @app.get("/api/coins/search")
 async def search_endpoint(q: str = Query(..., min_length=2)):
