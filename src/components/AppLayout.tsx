@@ -17,7 +17,7 @@ export default function AppLayout({ children, isAuthenticated }: Props) {
   return (
     <div className="min-h-screen bg-base-200 text-base-content">
       <header className="w-full flex justify-between items-center p-4 bg-base-100 shadow">
-        <h1 className="text-xl font-bold">Crypto App</h1>
+        <h1 className="text-xl font-bold">CryptoPulse</h1>
         {isAuthenticated ? (
           <button className="btn btn-error btn-sm" onClick={handleLogout}>
             Log Out
