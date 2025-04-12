@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@plugin "daisyui";
+
 
 /* ❌ REMOVA essa limitação de largura e centralização */
 #root {
