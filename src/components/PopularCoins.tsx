@@ -64,9 +64,8 @@ export default function PopularCoins() {
       setError(null)
       try {
         // Fetch top 10 coins including sparkline data and 24h price change
-        const res = await fetch(
-          "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=true&price_change_percentage=24h"
-        )
+        const res = await fetch("http://localhost:8000/api/coins/popular")
+
         if (!res.ok) throw new Error(`API request failed: ${res.status}`)
         const data = await res.json()
 
