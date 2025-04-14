@@ -1,13 +1,12 @@
+// src/App.tsx
 import { useEffect, useState } from "react"
 import { supabase } from "./lib/supabaseClient"
-import Auth from "./components/auth/AuthForm"
 import AppLayout from "./components/AppLayout"
 import PopularCoins from "./pages/PopularCoins"
 import SearchBar from "./components/SearchBar"
 
 function App() {
   const [user, setUser] = useState<any>(null)
-  const [showAuth, setShowAuth] = useState(false)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
@@ -20,10 +19,6 @@ function App() {
       listener.subscription.unsubscribe()
     }
   }, [])
-
-  if (showAuth) {
-    return <Auth />
-  }
 
   return (
     <AppLayout isAuthenticated={!!user}>

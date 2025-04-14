@@ -2,6 +2,7 @@ import { useState } from "react"
 import { supabase } from "../lib/supabaseClient"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
+import { Link } from "react-router-dom"
 
 interface Props {
   children: React.ReactNode
@@ -26,7 +27,7 @@ export default function AppLayout({ children, isAuthenticated }: Props) {
           </Button>
         ) : (
           <Button asChild size="sm">
-            <a href="#auth">Sign In / Sign Up</a>
+            <Link to="/auth">Sign In / Sign Up</Link>
           </Button>
         )}
       </header>
@@ -37,9 +38,7 @@ export default function AppLayout({ children, isAuthenticated }: Props) {
           <TabsTrigger value="alerts">Alerts</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="coins">
-          {children}
-        </TabsContent>
+        <TabsContent value="coins">{children}</TabsContent>
 
         <TabsContent value="alerts">
           {isAuthenticated ? (
