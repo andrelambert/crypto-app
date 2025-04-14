@@ -1,5 +1,10 @@
 import { useState } from "react"
 import { supabase } from "../../lib/supabaseClient"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 
 export default function Auth() {
   const [email, setEmail] = useState("")
@@ -14,53 +19,36 @@ export default function Auth() {
     setError("")
 
     if (isLogin) {
-      // Attempt to log in with email/password
+      // Tentativa de login com email/senha
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) {
-        // Show the error returned by Supabase
         setError(error.message)
       } else {
         alert("Logged in successfully!")
       }
-
     } else {
-      /**
-       * ✨ SIGN UP LOGIC
-       *
-       * Supabase does not return an error if the email is already confirmed.
-       * So we manually check whether the email already exists and is confirmed
-       * by trying to log in silently. If that works — or fails with invalid password —
-       * we assume the user already exists and suggest login instead of sign up.
-       */
-
-      // Step 1: Try silent login to detect if the email already exists
+      // Tenta login silencioso para detectar se o e-mail já está cadastrado
       const { error: existingError } = await supabase.auth.signInWithPassword({
         email,
         password,
-      });
+      })
 
-      // If login worked or failed due to wrong password, assume user already exists
       if (!existingError || existingError.message.includes("Invalid login credentials")) {
-        setError("This email is already registered. Try logging in instead.");
-        setLoading(false);
-        return;
+        setError("This email is already registered. Try logging in instead.")
+        setLoading(false)
+        return
       }
 
-      // Step 2: If not registered or pending confirmation, proceed with sign up
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      // Se o usuário não estiver registrado ou estiver pendente, procede com o sign up
+      const { error: signUpError } = await supabase.auth.signUp({ email, password })
 
       if (signUpError) {
-        // Handle unexpected sign-up error
-        setError(signUpError.message);
-        setLoading(false);
-        return;
+        setError(signUpError.message)
+        setLoading(false)
+        return
       }
 
-      // Success: user created (or pending confirmation)
-      alert("Account created successfully! Please confirm your email.");
+      alert("Account created successfully! Please confirm your email.")
     }
 
     setLoading(false)
@@ -68,56 +56,55 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-base-200">
-      <div className="card w-96 bg-base-100 shadow-xl">
-        <div className="card-body">
-          <h2 className="card-title justify-center">
-            {isLogin ? "Login" : "Sign Up"}
-          </h2>
-
+      <Card className="w-96">
+        <CardHeader className="text-center">
+          <CardTitle>{isLogin ? "Login" : "Sign Up"}</CardTitle>
+        </CardHeader>
+        <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="email"
-              placeholder="Email"
-              className="input input-bordered w-full"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-
-            <input
-              type="password"
-              placeholder="Password"
-              className="input input-bordered w-full"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
-
-            <button
-              type="submit"
-              className={`btn w-full ${loading ? "btn-disabled" : "btn-primary"}`}
-            >
+            <Button type="submit" disabled={loading} className="w-full">
               {loading ? "Loading..." : isLogin ? "Log In" : "Create Account"}
-            </button>
+            </Button>
           </form>
-
-          <div className="divider">or</div>
-
-          <button
-            className="btn btn-ghost text-sm"
+        </CardContent>
+        <CardFooter className="flex flex-col items-center space-y-4">
+          <Separator>or</Separator>
+          <Button
+            variant="ghost"
             onClick={() => {
               setIsLogin(!isLogin)
-              setError("") // Clear errors on toggle
+              setError("")
             }}
           >
             {isLogin
               ? "Don't have an account? Sign up"
               : "Already have an account? Log in"}
-          </button>
-        </div>
-      </div>
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   )
 }
