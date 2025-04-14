@@ -8,7 +8,6 @@ import SearchBar from "./components/SearchBar"
 
 import { Button } from "./components/ui/button"
 
-
 function App() {
   const [user, setUser] = useState<any>(null)
   const [showAuth, setShowAuth] = useState(false)
