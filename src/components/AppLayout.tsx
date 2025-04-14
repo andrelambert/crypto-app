@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { supabase } from "../lib/supabaseClient"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
 
 interface Props {
   children: React.ReactNode
@@ -15,48 +17,40 @@ export default function AppLayout({ children, isAuthenticated }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-base-200 text-base-content">
-      <header className="w-full flex justify-between items-center p-4 bg-base-100 shadow">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="w-full flex justify-between items-center p-4 border-b shadow-sm">
         <h1 className="text-xl font-bold">CryptoPulse</h1>
         {isAuthenticated ? (
-          <button className="btn btn-error btn-sm" onClick={handleLogout}>
+          <Button variant="destructive" size="sm" onClick={handleLogout}>
             Log Out
-          </button>
+          </Button>
         ) : (
-          <a href="#auth" className="btn btn-primary btn-sm">Sign In / Sign Up</a>
+          <Button asChild size="sm">
+            <a href="#auth">Sign In / Sign Up</a>
+          </Button>
         )}
       </header>
 
-      <div className="tabs tabs-boxed justify-center mt-6">
-        <a
-          className={`tab ${activeTab === "coins" ? "tab-active" : ""}`}
-          onClick={() => setActiveTab("coins")}
-        >
-          Coins
-        </a>
-        <a
-          className={`tab ${activeTab === "alerts" ? "tab-active" : ""}`}
-          onClick={() => setActiveTab("alerts")}
-        >
-          Alerts
-        </a>
-      </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-6xl mx-auto px-4 py-6">
+        <TabsList className="mb-4 flex justify-center">
+          <TabsTrigger value="coins">Coins</TabsTrigger>
+          <TabsTrigger value="alerts">Alerts</TabsTrigger>
+        </TabsList>
 
-    <main className="max-w-6xl mx-auto px-4 py-6">
-        {activeTab === "coins" && (
-            <div>{children}</div>
-        )}
-        {activeTab === "alerts" && (
-            isAuthenticated ? (
+        <TabsContent value="coins">
+          {children}
+        </TabsContent>
+
+        <TabsContent value="alerts">
+          {isAuthenticated ? (
             <p>[Here we will render alerts later]</p>
-            ) : (
-            <p className="text-center mt-10 text-warning text-lg">
-                Please log in to view your alerts.
+          ) : (
+            <p className="text-center mt-10 text-yellow-600 text-lg">
+              Please log in to view your alerts.
             </p>
-            )
-        )}
-    </main>
-
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

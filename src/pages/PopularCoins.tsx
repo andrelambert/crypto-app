@@ -97,31 +97,33 @@ export default function PopularCoins() {
   }
 
   return (
-    // Wrapper with spacing and horizontal centering
-    <div className="space-y-2 max-w-3xl mx-auto px-2">
+    // Container for the list of coins
+    // Using Tailwind CSS for styling
+    // Adjust the width and padding as needed
+    <div className="w-xl mx-auto px-2">
       {coins.map((coin) => {
         const normalizedSparklineData = normalizeSparkline(coin.sparkline_in_7d?.price)
         const isPositive = coin.price_change_percentage_24h >= 0
         const textColor = isPositive ? "text-green-500" : "text-red-500"
-        const chartColor = isPositive ? "rgba(34,197,94,0.85)" : "rgba(239,68,68,0.85)" // Tailwind green/red with opacity
+        const chartColor = isPositive ? "rgba(61, 171, 102, 0.85)" : "rgba(243, 61, 61, 0.85)" // Color of the sparkline chart
 
         return (
           <Card
             key={coin.id}
-            className="bg-[#2d333c] border-[#444c56] rounded-xl overflow-hidden hover:scale-[1.01] transition-transform"
+            className="my-2 hover:scale-[1.01] transition-transform"
           >
-            <CardContent className="px-4 py-3 flex flex-wrap md:flex-nowrap items-center justify-between gap-4">
+            <CardContent className="px-4 py-3 flex flex-wrap md:flex-nowrap items-center justify-between gap-3">
               {/* Left: Coin image and name */}
               <div className="flex items-center gap-3 flex-shrink-0 mr-1">
                 <img src={coin.image} alt={coin.name} className="w-8 h-8" />
                 <div>
-                  <p className="font-medium text-gray-100 text-base">{coin.symbol.toUpperCase()}</p>
-                  <p className="text-sm text-gray-400">{coin.name}</p>
+                  <p className="font-medium text-base">{coin.symbol.toUpperCase()}</p>
+                  <p className="text-sm">{coin.name}</p>
                 </div>
               </div>
 
               {/* Center: Sparkline chart */}
-              <div className="flex-1 flex justify-center items-center h-10 min-w-[80px] max-w-[140px] mx-auto">
+              <div className="flex-1 flex justify-center items-center h-10 min-w-[50px] max-w-[100px] mx-auto">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={normalizedSparklineData}>
                     <Line
@@ -138,7 +140,7 @@ export default function PopularCoins() {
 
               {/* Right: Current price and percentage variation */}
               <div className="text-right flex-shrink-0 ml-1">
-                <p className="font-semibold text-base text-gray-100">
+                <p className="font-semibold text-base">
                   {formatCurrency(coin.current_price)}
                 </p>
                 <p className={`text-sm font-medium ${textColor}`}>

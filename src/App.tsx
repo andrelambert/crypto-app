@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react"
 import { supabase } from "./lib/supabaseClient"
 
-import Auth from "./pages/Auth"
+import Auth from "./components/auth/AuthForm"
 import AppLayout from "./components/AppLayout"
-import PopularCoins from "./components/PopularCoins"
+import PopularCoins from "./pages/PopularCoins"
 import SearchBar from "./components/SearchBar"
+
+import { Button } from "./components/ui/button"
+
 
 function App() {
   const [user, setUser] = useState<any>(null)
@@ -28,6 +31,7 @@ function App() {
 
   return (
     <AppLayout isAuthenticated={!!user}>
+      <Button>Button</Button>
       <SearchBar />
       <PopularCoins />
     </AppLayout>
