@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
+import { useNavigate } from "react-router-dom"
 
 interface CoinSearchResult {
   id: string
@@ -11,20 +12,18 @@ interface CoinSearchResult {
 }
 
 interface SearchBarProps {
-  onCoinSelect?: (coin: CoinSearchResult) => void
   className?: string
 }
 
-export default function SearchBar({ onCoinSelect, className }: SearchBarProps) {
+export default function SearchBar({ className }: SearchBarProps) {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<CoinSearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showResults, setShowResults] = useState(false)
-
   const containerRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
-  // Busca local usando o FastAPI com cache
   const fetchSuggestions = useCallback(async (q: string) => {
     setLoading(true)
     setError(null)
@@ -60,7 +59,6 @@ export default function SearchBar({ onCoinSelect, className }: SearchBarProps) {
     return () => clearTimeout(delayDebounce)
   }, [query, fetchSuggestions])
 
-  // Fecha ao clicar fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -75,7 +73,7 @@ export default function SearchBar({ onCoinSelect, className }: SearchBarProps) {
     setQuery("")
     setResults([])
     setShowResults(false)
-    if (onCoinSelect) onCoinSelect(coin)
+    navigate(`/coin/${coin.id}`)
   }
 
   return (
@@ -92,11 +90,11 @@ export default function SearchBar({ onCoinSelect, className }: SearchBarProps) {
       />
 
       {showResults && (
-        <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-[#2d333c] border border-[#444c56] rounded-lg shadow-lg overflow-hidden max-h-80 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden max-h-80 overflow-y-auto">
           {loading && (
             <div className="p-3 space-y-2">
               {[...Array(3)].map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full rounded-md bg-[#3b434d]" />
+                <Skeleton key={i} className="h-10 w-full rounded-md bg-muted" />
               ))}
             </div>
           )}
@@ -112,16 +110,16 @@ export default function SearchBar({ onCoinSelect, className }: SearchBarProps) {
           )}
 
           {!loading && !error && results.length > 0 && (
-            <ul className="divide-y divide-[#3b434d]">
+            <ul className="divide-y divide-muted">
               {results.map((coin) => (
                 <li key={coin.id}>
                   <button
                     type="button"
                     onClick={() => handleResultClick(coin)}
-                    className="w-full text-left p-3 hover:bg-[#39414d] focus:outline-none focus:bg-[#3f4a59] transition duration-150 ease-in-out flex items-center gap-3"
+                    className="w-full text-left p-3 hover:bg-muted focus:outline-none transition duration-150 ease-in-out flex items-center gap-3"
                   >
                     <img src={coin.thumb} alt={coin.name} className="w-6 h-6 rounded-full" />
-                    <span className="text-sm text-gray-200 font-medium">
+                    <span className="text-sm text-foreground font-medium">
                       {coin.name} ({coin.symbol.toUpperCase()})
                     </span>
                   </button>
