@@ -1,5 +1,3 @@
-# backend/services/popular.py
-
 import httpx
 import asyncio
 from time import time
@@ -34,7 +32,7 @@ async def get_popular_coins() -> List[Dict]:
                 },
             )
             full_data = rank_res.json()
-            filtered = [c for c in full_data if c["id"] not in EXCLUDED_IDS][:6]
+            filtered = [c for c in full_data if c["id"] not in EXCLUDED_IDS][:50]
             CACHE_MARKET_RANK["rank"] = {
                 "data": filtered,
                 "timestamp": now
