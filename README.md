@@ -8,3 +8,7 @@ npm run dev
 
 # rodar backend:
 uvicorn main:app --reload --port 8000
+
+# para limpar cache
+http://localhost:8000/debug/clear-cache
+
