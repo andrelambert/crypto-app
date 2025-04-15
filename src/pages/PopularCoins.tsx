@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { LineChart, Line, ResponsiveContainer } from "recharts"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -89,10 +90,9 @@ export default function PopularCoins() {
   const [allCoins, setAllCoins] = useState<Coin[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
-  // Estados para paginação
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchCoins = async () => {
@@ -124,6 +124,7 @@ export default function PopularCoins() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentCoins = allCoins.slice(indexOfFirstItem, indexOfLastItem)
   const totalPages = Math.ceil(allCoins.length / itemsPerPage)
+  const pageItems = generatePageNumbers(currentPage, totalPages)
 
   if (loading) {
     return <p className="text-center text-gray-400 py-6">Loading popular coins...</p>
@@ -133,25 +134,26 @@ export default function PopularCoins() {
     return <p className="text-center text-red-500 py-6">Error: {error}</p>
   }
 
-  // Gera os itens de paginação
-  const pageItems = generatePageNumbers(currentPage, totalPages)
-
   return (
     <div className="w-xl mx-auto px-2">
       {currentCoins.map((coin) => {
         const normalizedSparklineData = normalizeSparkline(coin.sparkline_in_7d?.price)
         const isPositive = coin.price_change_percentage_24h >= 0
-        const textColor = isPositive ? "text-green-500" : "text-red-500"
+        const textColor = isPositive ? "text-[#41a271]" : "text-[#EF5E6A]"
         const chartColor = isPositive
           ? "rgba(61, 171, 102, 0.85)"
           : "rgba(243, 61, 61, 0.85)"
 
         return (
-          <Card key={coin.id} className="my-2 hover:scale-[1.01] transition-transform">
-            <CardContent className="px-4 py-3 flex flex-wrap md:flex-nowrap items-center justify-between gap-3">
+          <Card
+            key={coin.id}
+            className="my-2 hover:scale-[1.01] transition-transform cursor-pointer"
+            onClick={() => navigate(`/coin/${coin.id}`)}
+          >
+            <CardContent className="px-4 py-1 flex flex-wrap md:flex-nowrap items-center justify-between gap-3">
               {/* Esquerda: Imagem e nome da moeda */}
               <div className="flex items-center gap-3 flex-shrink-0 mr-1">
-                <img src={coin.image} alt={coin.name} className="w-8 h-8" />
+                <img src={coin.image} alt={coin.name} className="w-9 h-9" />
                 <div>
                   <p className="font-medium text-base">{coin.symbol.toUpperCase()}</p>
                   <p className="text-sm">{coin.name}</p>
@@ -176,7 +178,7 @@ export default function PopularCoins() {
 
               {/* Direita: Preço atual e variação percentual */}
               <div className="text-right flex-shrink-0 ml-1">
-                <p className="font-semibold text-base">{formatCurrency(coin.current_price)}</p>
+                <p className="text-base font-medium">{formatCurrency(coin.current_price)}</p>
                 <p className={`text-sm font-medium ${textColor}`}>
                   {formatPercentage(coin.price_change_percentage_24h)}
                 </p>
@@ -187,7 +189,7 @@ export default function PopularCoins() {
       })}
 
       {/* Paginação utilizando os componentes do shadcn */}
-      <div className="mt-4">
+      <div className="pt-4 mt-4">
         <Pagination>
           <PaginationContent>
             <PaginationItem>

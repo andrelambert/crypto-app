@@ -77,7 +77,7 @@ export default function SearchBar({ className }: SearchBarProps) {
   }
 
   return (
-    <div ref={containerRef} className={cn("relative w-full max-w-xl mx-auto", className)}>
+    <div ref={containerRef} className={cn("relative w-lg mx-auto", className)}>
       <Input
         type="text"
         placeholder="Search for a cryptocurrency..."
@@ -116,7 +116,7 @@ export default function SearchBar({ className }: SearchBarProps) {
                   <button
                     type="button"
                     onClick={() => handleResultClick(coin)}
-                    className="w-full text-left p-3 hover:bg-muted focus:outline-none transition duration-150 ease-in-out flex items-center gap-3"
+                    className="cursor-pointer w-full text-left p-3 hover:bg-muted focus:outline-none transition duration-150 ease-in-out flex items-center gap-3"
                   >
                     <img src={coin.thumb} alt={coin.name} className="w-6 h-6 rounded-full" />
                     <span className="text-sm text-foreground font-medium">
