@@ -77,7 +77,7 @@ export default function SearchBar({ className }: SearchBarProps) {
   }
 
   return (
-    <div ref={containerRef} className={cn("relative w-lg mx-auto", className)}>
+    <div ref={containerRef} className={cn("relative mb-6 w-sm mx-auto", className)}>
       <Input
         type="text"
         placeholder="Search for a cryptocurrency..."

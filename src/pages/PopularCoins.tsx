@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { LineChart, Line, ResponsiveContainer } from "recharts"
 import { Card, CardContent } from "@/components/ui/card"
+import { Toggle } from "@/components/ui/toggle"
+import { Star } from "lucide-react"
 import {
   Pagination,
   PaginationContent,
@@ -73,13 +75,10 @@ const generatePageNumbers = (current: number, total: number): (number | "ellipsi
     }
   } else {
     if (current <= 4) {
-      // Mostra as primeiras 5 páginas, ellipsis e a última
       pages.push(1, 2, 3, 4, 5, "ellipsis", total)
     } else if (current >= total - 3) {
-      // Mostra a primeira, ellipsis e as últimas 5 páginas
       pages.push(1, "ellipsis", total - 4, total - 3, total - 2, total - 1, total)
     } else {
-      // Mostra a primeira, ellipsis, páginas próximas ao atual e a última
       pages.push(1, "ellipsis", current - 1, current, current + 1, "ellipsis", total)
     }
   }
@@ -99,12 +98,10 @@ export default function PopularCoins() {
       setLoading(true)
       setError(null)
       try {
-        // Busca todos os resultados (não limitamos para 6)
         const res = await fetch("http://localhost:8000/api/coins/popular")
         if (!res.ok) throw new Error(`API request failed: ${res.status}`)
         const data = await res.json()
 
-        // Filtra para remover stablecoins, por exemplo, Tether e USD Coin.
         const filtered = data.filter((coin: Coin) =>
           !["tether", "usd-coin"].includes(coin.id.toLowerCase())
         )
@@ -119,7 +116,6 @@ export default function PopularCoins() {
     fetchCoins()
   }, [])
 
-  // Calcula os índices para exibir os itens da página atual
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
   const currentCoins = allCoins.slice(indexOfFirstItem, indexOfLastItem)
@@ -151,7 +147,7 @@ export default function PopularCoins() {
             onClick={() => navigate(`/coin/${coin.id}`)}
           >
             <CardContent className="px-4 py-1 flex flex-wrap md:flex-nowrap items-center justify-between gap-3">
-              {/* Esquerda: Imagem e nome da moeda */}
+              {/* Esquerda: Imagem e dados da moeda */}
               <div className="flex items-center gap-3 flex-shrink-0 mr-1">
                 <img src={coin.image} alt={coin.name} className="w-9 h-9" />
                 <div>
@@ -176,12 +172,19 @@ export default function PopularCoins() {
                 </ResponsiveContainer>
               </div>
 
-              {/* Direita: Preço atual e variação percentual */}
-              <div className="text-right flex-shrink-0 ml-1">
-                <p className="text-base font-medium">{formatCurrency(coin.current_price)}</p>
-                <p className={`text-sm font-medium ${textColor}`}>
-                  {formatPercentage(coin.price_change_percentage_24h)}
-                </p>
+              {/* Direita: Informações de preço e botão Favoritar */}
+              <div className="flex items-center gap-2 flex-shrink-0 ml-1">
+                <div className="text-right">
+                  <p className="text-base font-medium">
+                    {formatCurrency(coin.current_price)}
+                  </p>
+                  <p className={`text-sm font-medium ${textColor}`}>
+                    {formatPercentage(coin.price_change_percentage_24h)}
+                  </p>
+                </div>
+                <Toggle className="cursor-pointer" variant="outline">
+                  <Star size={16} />
+                </Toggle>
               </div>
             </CardContent>
           </Card>
