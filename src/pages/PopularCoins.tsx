@@ -13,6 +13,16 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog"
+import { supabase } from "@/lib/supabaseClient"
 
 // Define a interface para o objeto Coin retornado pela API
 interface Coin {
@@ -47,19 +57,13 @@ const formatPercentage = (value: number) => {
 // Normaliza os dados do sparkline para uma escala de 0 a 100
 const normalizeSparkline = (prices: number[] | null | undefined): { name: string; value: number }[] => {
   if (!prices || prices.length === 0) return []
-
   const validPrices = prices.filter(price => typeof price === "number" && isFinite(price))
   if (validPrices.length < 2)
     return validPrices.map((_, index) => ({ name: `p${index}`, value: 50 }))
-
   const minPrice = Math.min(...validPrices)
   const maxPrice = Math.max(...validPrices)
   const range = maxPrice - minPrice
-
-  if (range === 0) {
-    return validPrices.map((_, index) => ({ name: `p${index}`, value: 50 }))
-  }
-
+  if (range === 0) return validPrices.map((_, index) => ({ name: `p${index}`, value: 50 }))
   return validPrices.map((price, index) => ({
     name: `p${index}`,
     value: ((price - minPrice) / range) * 100,
@@ -93,21 +97,49 @@ export default function PopularCoins() {
   const itemsPerPage = 5
   const navigate = useNavigate()
 
+  // Estado para usuário (autenticação) – assumindo que você está usando supabase
+  const [user, setUser] = useState<any>(null)
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser()
+      setUser(data.user)
+    }
+    fetchUser()
+  }, [])
+
+  // Estado para controlar o Alert Dialog (usuário não logado)
+  const [showFavoriteAlert, setShowFavoriteAlert] = useState(false)
+
+  // Função para adicionar moeda aos favoritos no Supabase
+  const addToFavorites = async (coin: Coin) => {
+    const { error } = await supabase.from("favorite_cryptos").insert({
+      user_id: user.id,
+      coin_id: coin.id,
+      // Inclua outros campos se necessário
+    })
+    if (error) {
+      console.error("Erro ao adicionar aos favoritos:", error)
+    } else {
+      console.log("Moeda adicionada aos favoritos com sucesso!")
+    }
+  }
+
   useEffect(() => {
     const fetchCoins = async () => {
       setLoading(true)
       setError(null)
       try {
+        // Busca todos os resultados
         const res = await fetch("http://localhost:8000/api/coins/popular")
         if (!res.ok) throw new Error(`API request failed: ${res.status}`)
         const data = await res.json()
-
+        // Filtra para remover stablecoins
         const filtered = data.filter((coin: Coin) =>
           !["tether", "usd-coin"].includes(coin.id.toLowerCase())
         )
         setAllCoins(filtered)
       } catch (err) {
-        console.error("Failed to fetch coins:", err)
+        console.error("Falha ao buscar as moedas:", err)
         setError(err instanceof Error ? err.message : "Unknown error")
       } finally {
         setLoading(false)
@@ -155,7 +187,6 @@ export default function PopularCoins() {
                   <p className="text-sm">{coin.name}</p>
                 </div>
               </div>
-
               {/* Centro: Gráfico sparkline */}
               <div className="flex-1 flex justify-center items-center h-10 min-w-[50px] max-w-[100px] mx-auto">
                 <ResponsiveContainer width="100%" height="100%">
@@ -171,18 +202,26 @@ export default function PopularCoins() {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-
               {/* Direita: Informações de preço e botão Favoritar */}
               <div className="flex items-center gap-2 flex-shrink-0 ml-1">
                 <div className="text-right">
-                  <p className="text-base font-medium">
-                    {formatCurrency(coin.current_price)}
-                  </p>
+                  <p className="text-base font-medium">{formatCurrency(coin.current_price)}</p>
                   <p className={`text-sm font-medium ${textColor}`}>
                     {formatPercentage(coin.price_change_percentage_24h)}
                   </p>
                 </div>
-                <Toggle className="cursor-pointer" variant="outline">
+                <Toggle
+                  className="cursor-pointer"
+                  variant={user ? "default" : "outline"}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (!user) {
+                      setShowFavoriteAlert(true)
+                    } else {
+                      addToFavorites(coin)
+                    }
+                  }}
+                >
                   <Star size={16} />
                 </Toggle>
               </div>
@@ -190,7 +229,22 @@ export default function PopularCoins() {
           </Card>
         )
       })}
-
+      {/* Alert Dialog para usuário deslogado */}
+      <AlertDialog open={showFavoriteAlert} onOpenChange={setShowFavoriteAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>You need to sign in</AlertDialogTitle>
+            <AlertDialogDescription>
+              You need to sign in to be able to favorite a coin.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowFavoriteAlert(false)}>
+              Ok
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {/* Paginação utilizando os componentes do shadcn */}
       <div className="pt-4 mt-4">
         <Pagination>
